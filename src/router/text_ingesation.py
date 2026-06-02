@@ -1,9 +1,11 @@
-from fastapi import APIRouter 
-from src.models.user_text import UserText
-from src.pipeline.text_moderation import text_pipeline
-router = APIRouter(prefix = "/text_ingestion", tags=["text_ingestion"])
+from fastapi import APIRouter, HTTPException
+from src.models.model_response import ModerationResponse, ModerationRequest
+from src.service.moderation_service import moderate_text
 
-@router.post("/text_ingest")
-async def ingest_text(text : UserText):
-    is_moderate =text_pipeline(text.text)
-    return {"message": text, "is_moderate": is_moderate}
+router = APIRouter(prefix="/moderate", tags=["moderation"])
+
+@router.post("/", response_model=ModerationResponse)
+async def moderate(request: ModerationRequest) -> ModerationResponse:
+    if not request.text.strip():
+        raise HTTPException(status_code=422, detail="Text cannot be empty")
+    return moderate_text(request.text)

@@ -2,6 +2,7 @@ torch
 fastapi
 uvicorn
 pydantic
+python-dotenv
 transformers
 sentence-transformers
 scikit-learn
